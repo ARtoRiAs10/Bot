@@ -5,6 +5,8 @@ Run: python main.py
 
 import os
 from dotenv import load_dotenv
+from flask import Flask
+from threading import Thread
 
 # Load variables from .env file
 load_dotenv()
@@ -22,6 +24,24 @@ from bot.handlers import (
 )
 from bot.utils import logger
 
+# ─── ADDED: Render Keep-Alive Logic (Does not affect bot logic) ──────────────
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is alive"
+
+def run_flask():
+    # Use the port Render provides or default to 10000
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    """Starts a dummy server so Render doesn't kill the process."""
+    t = Thread(target=run_flask)
+    t.daemon = True
+    t.start()
+# ─────────────────────────────────────────────────────────────────────────────
 
 def main():
     # ─── 1. Validate Environment ─────────────────────────────────────────────
@@ -36,34 +56,37 @@ def main():
         logger.error("❌ OPENROUTER_API_KEY not set in .env")
         return
 
+    # START KEEP ALIVE HERE
+    keep_alive()
+
     # Log the startup status
     logger.info("🚀 Starting YouTube Bot via OpenRouter Gateway")
     logger.info("📡 Using Hybrid Provider Rotation (Scraper + AI)")
 
     # ─── 2. Build Application ────────────────────────────────────────────────
-    app = Application.builder().token(token).build()
+    app_tg = Application.builder().token(token).build()
 
     # Commands
-    app.add_handler(CommandHandler("start",        cmd_start))
-    app.add_handler(CommandHandler("help",         cmd_help))
-    app.add_handler(CommandHandler("reset",        cmd_reset))
-    app.add_handler(CommandHandler("language",     cmd_language))
-    app.add_handler(CommandHandler("summary",      cmd_summary))
-    app.add_handler(CommandHandler("deepdive",     cmd_deepdive))
-    app.add_handler(CommandHandler("actionpoints", cmd_actionpoints))
+    app_tg.add_handler(CommandHandler("start",        cmd_start))
+    app_tg.add_handler(CommandHandler("help",         cmd_help))
+    app_tg.add_handler(CommandHandler("reset",        cmd_reset))
+    app_tg.add_handler(CommandHandler("language",     cmd_language))
+    app_tg.add_handler(CommandHandler("summary",      cmd_summary))
+    app_tg.add_handler(CommandHandler("deepdive",     cmd_deepdive))
+    app_tg.add_handler(CommandHandler("actionpoints", cmd_actionpoints))
 
     # All text messages (URLs and Questions)
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app_tg.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Global Error Handler
-    app.add_error_handler(handle_error)
+    app_tg.add_error_handler(handle_error)
 
     # ─── 3. Run Bot ──────────────────────────────────────────────────────────
     logger.info("🤖 Bot is live! Press Ctrl+C to stop.")
     
     # drop_pending_updates=True prevents the bot from replying to old messages
     # that were sent while the bot was offline.
-    app.run_polling(allowed_updates=["message"], drop_pending_updates=True)
+    app_tg.run_polling(allowed_updates=["message"], drop_pending_updates=True)
 
 
 if __name__ == "__main__":
