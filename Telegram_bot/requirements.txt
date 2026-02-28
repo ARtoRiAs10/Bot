@@ -21,3 +21,6 @@ numpy==1.26.4
 python-dotenv==1.0.1
 huggingface-hub==0.23.0         # Added to handle local embedding downloads
 redis==5.0.1                    # Optional: for user session caching
+
+flask==3.1.0
+gunicorn==23.0.0
