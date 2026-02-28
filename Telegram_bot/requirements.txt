@@ -1,12 +1,17 @@
 # ── Telegram ──────────────────────────────────────────────
 python-telegram-bot==20.7
 
-# ── Google Gemini (handles YouTube natively) ──────────────
-google-generativeai==0.5.4
+# ── AI Gateway (OpenRouter / OpenAI) ──────────────────────
+# Replaced google-generativeai with openai for OpenRouter compatibility
+openai==1.14.3
+
+# ── YouTube Scraping (Bypasses AI Quotas) ─────────────────
+# Essential for getting transcripts without hitting Gemini limits
+youtube-transcript-api==0.6.2
 
 # ── Embeddings (FREE local — for RAG Q&A) ─────────────────
 sentence-transformers==2.5.1
-torch==2.2.2                    # CPU-only is fine
+torch==2.2.2                    # CPU-only version is sufficient
 
 # ── Vector Search ─────────────────────────────────────────
 faiss-cpu==1.7.4
@@ -14,4 +19,5 @@ numpy==1.26.4
 
 # ── Utilities ─────────────────────────────────────────────
 python-dotenv==1.0.1
-redis==5.0.1                    # optional caching
+huggingface-hub==0.21.4         # Added to handle local embedding downloads
+redis==5.0.1                    # Optional: for user session caching
