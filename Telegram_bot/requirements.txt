@@ -14,10 +14,10 @@ sentence-transformers==2.5.1
 torch==2.2.2                    # CPU-only version is sufficient
 
 # ── Vector Search ─────────────────────────────────────────
-faiss-cpu==1.7.4
+faiss-cpu==1.8.0.post1
 numpy==1.26.4
 
 # ── Utilities ─────────────────────────────────────────────
 python-dotenv==1.0.1
-huggingface-hub==0.21.4         # Added to handle local embedding downloads
+huggingface-hub==0.23.0         # Added to handle local embedding downloads
 redis==5.0.1                    # Optional: for user session caching
